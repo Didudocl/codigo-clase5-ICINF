@@ -1,18 +1,18 @@
 import { Router } from "express";
 import {
-    createUser,
-    deleteUser,
     getUser,
     getUsers,
-    updateUser
 } from '../controllers/user.controller.js';
+import { authenticateJwt } from '../middlewares/authentication.middleware.js';
+import { isAdmin } from '../middlewares/authorization.middleware.js';
 
 const router = Router();
 
-router.post('/', createUser); // * http://localhost:3000/api/user/ - post
-router.get('/all', getUsers); // * http://localhost:3000/api/user/all - get
-router.get('/:id', getUser); // * http://localhost:3000/api/user/:id - get
-router.put('/:id', updateUser); // * http://localhost:3000/api/user/:id - put
-router.delete('/:id', deleteUser); // * http://localhost:3000/api/user/:id - delete
+router
+    .use(authenticateJwt) // Verifico si inicio sesión
+    .use(isAdmin); // Verifico si ese usuario con sesión iniciada tiene el rol de administrador
+
+router.get('/all', getUsers);
+router.get('/:id', getUser);
 
 export default router;
